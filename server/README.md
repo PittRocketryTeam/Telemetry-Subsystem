@@ -1,4 +1,7 @@
-# Rocketry Server - Adapted from 'Server Sample' made by Adam J. Lee (adamlee@cs.pitt.edu)
+# Rocketry Server
+## Adapted from 'Server Sample' made by Adam J. Lee (adamlee@cs.pitt.edu)
+
+
 
 ## To run this sample code locally:
 
