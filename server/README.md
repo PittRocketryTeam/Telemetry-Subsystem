@@ -1,5 +1,5 @@
 # Rocketry Server
-## Adapted from 'Server Sample' made by Adam J. Lee (adamlee@cs.pitt.edu)
+## Adapted from 'Server Sample' made by Adam J. Lee (adamlee@cs.pitt.edu) - https://github.com/2211-cs1653/server-sample
 
 
 
