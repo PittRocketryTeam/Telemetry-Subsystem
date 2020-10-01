@@ -26,7 +26,7 @@
       ```console
       cd Desktop/repos/Telemetry-Subsystem/visualizer/build
       ```
-      Generate a makefile.
+      Generate a makefile/update assets folder.
       ```console
       cmake ..
       ```
