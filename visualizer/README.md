@@ -38,3 +38,9 @@
       ```console
       ./visualizer 
       ```
+      
+## Other Notes
+If you run out of disk space:
+```console
+qemu-img(.exe if on windows) resize ./soar_vm.qcow2 +2G (adds 2 gigabytes)
+```
