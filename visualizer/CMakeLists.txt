@@ -46,3 +46,18 @@ add_executable(${PROJECT_NAME} ${sources})
 target_compile_options(${PROJECT_NAME} PRIVATE ${flags})
 target_include_directories(${PROJECT_NAME} PRIVATE ${incl})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${libs})   
+
+if (${BUILD_EXAMPLES})
+
+file(GLOB exsrcs ./examples/src/* ./examples/include/*)
+
+list(REMOVE_ITEM sources ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+
+set(exname examples)
+
+add_executable(${exname} ${sources} ${exsrcs})
+target_compile_options(${exname} PRIVATE ${flags})
+target_include_directories(${exname} PRIVATE ${incl} ../include)
+target_link_libraries(${exname} PRIVATE ${libs})
+
+endif()
