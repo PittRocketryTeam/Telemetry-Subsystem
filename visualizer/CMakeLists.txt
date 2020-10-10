@@ -72,7 +72,6 @@ file(COPY ${assets} DESTINATION ./assets)
 add_executable(${PROJECT_NAME} ${sources})
 target_compile_options(${PROJECT_NAME} PRIVATE ${flags})
 target_include_directories(${PROJECT_NAME} PRIVATE ${incl})
-<<<<<<< Updated upstream
 target_link_libraries(${PROJECT_NAME} PRIVATE ${libs})   
 
 if (${BUILD_EXAMPLES})
@@ -89,6 +88,4 @@ target_include_directories(${exname} PRIVATE ${incl} ../include)
 target_link_libraries(${exname} PRIVATE ${libs})
 
 endif()
-=======
 target_link_libraries(${PROJECT_NAME} PRIVATE ${libs})
->>>>>>> Stashed changes
