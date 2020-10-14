@@ -20,7 +20,7 @@ void App::init()
     //test_cube = ModelLoader::open("assets/models/test_cube.dae"); //Cube object
 
     test_monk.rotate(0.0f, 0.0f, 0.0f); //Rotate the object model to its front
-    test_cube.position = glm::vec3(0.0f, 0.0f, 0.0f); 
+    test_monk.position = glm::vec3(0.0f, 0.0f, 0.0f); 
 
     radius = 2; //To move the object in a circle with radius 2 look at update method
     angle = 0.0f; //Start at the beginning of the unit circle :D
@@ -46,17 +46,17 @@ void App::update()
     test_monk.update(); 
   
     
-    //One view (circle movement)
-    Camera::lookAt(glm::vec3(test_cube.position.x, test_cube.position.y, 5), glm::vec3(0,0,0));
+    //One view (circle movement with camera follow)
+    //Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), glm::vec3(0,0,0));
 
-    //Second view (circle movement)
+    //Second view (circle movement without camera follow)
     //Camera::lookAt(glm::vec3(0.0f, 0.0f, 5), glm::vec3(0,0,0));
    
     //Try to change x, y, and z as the object is moving up (still figuring this out) to make the movement look seamless
-    //Camera::lookAt(glm::vec3(test_cube.position.x, test_cube.position.y, 5), glm::vec3(x, y, z));
+    //Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), glm::vec3(x, y, z));
 
     //This will focus on the object, but it won't show any movement although the object is moving. 
-    //Camera::lookAt(glm::vec3(test_cube.position.x, test_cube.position.y, 5), test_cube.position);
+    //Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), test_monk.position);
     Camera::updateView();  
 }
 
