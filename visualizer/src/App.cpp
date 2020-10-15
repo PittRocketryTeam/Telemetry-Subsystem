@@ -19,7 +19,6 @@ void App::init()
     test_monk = ModelLoader::open("assets/models/suzanne.dae"); //Monkey object
     //test_cube = ModelLoader::open("assets/models/test_cube.dae"); //Cube object
 
-    test_monk.rotate(0.0f, 0.0f, 0.0f); //Rotate the object model to its front
     test_monk.position = glm::vec3(0.0f, 0.0f, 0.0f); 
 
     radius = 2; //To move the object in a circle with radius 2 look at update method
@@ -56,7 +55,7 @@ void App::update()
     //Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), glm::vec3(x, y, z));
 
     //This will focus on the object, but it won't show any movement although the object is moving. 
-    //Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), test_monk.position);
+    Camera::lookAt(glm::vec3(test_monk.position.x, test_monk.position.y, 5), test_monk.position);
     Camera::updateView();  
 }
 
