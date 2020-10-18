@@ -7,17 +7,18 @@
  *
  */
 import java.math.BigInteger;
+import java.nio.ByteBuffer; // for the float2byte[]
 
 public class Message //implements java.io.Serializable
 {
 	//private static final long serialVersionUID = 3452098893656819551L;
 	/** The text string encoded in this Message object */
 	public String theMessage;
-	private final int packetLen = 32;
+	private final byte[] mlen = new BigInteger(String.valueOf("128")).toByteArray();
 	private final int messageIdLen = 32;
 	private BigInteger messageId;
-	private BigInteger value;
-	private BigInteger value2;
+	private float value;
+	private float value2;
 	
 	/**
 	* Constructor.
@@ -29,15 +30,22 @@ public class Message //implements java.io.Serializable
 	{
 		setMsgId(_msgid);
 	}
-	
-	public void setValue(int val)
+
+	public Message(int _msgid, float val, float val2)
 	{
-		value = new BigInteger(String.valueOf(val));
+		setMsgId(_msgid);
+		value = val;
+		value2 = val2;
+	}	
+	
+	public void setValue(float val)
+	{
+		value = val;
 	}
 	
-	public void setValue2(int val)
+	public void setValue2(float val)
 	{
-		value2 = new BigInteger(String.valueOf(val));
+		value2 = val;
 	}
 	
 	public void setMsgId(int id)
@@ -45,14 +53,37 @@ public class Message //implements java.io.Serializable
 		messageId = new BigInteger(String.valueOf(id));
 	}
 	
+	public static byte [] float2ByteArray(float value)
+	{  
+	     return ByteBuffer.allocate(4).putFloat(value).array();
+	}
+	
 	public byte[] getMessage()
 	{
 		byte[] retval = new byte[16];
 		byte[] tempm = messageId.toByteArray();
-		retval[0] = tempm[0];
-		retval[1] = tempm[1];
-		retval[2] = tempm[2];
-		retval[3] = tempm[3];
+		byte[] tempv1 = float2ByteArray(value);
+		byte[] tempv2 = float2ByteArray(value2);
+		
+		retval[0] = mlen[0];
+		retval[1] = mlen[1];
+		retval[2] = mlen[2];
+		retval[3] = mlen[3];
+		
+		retval[4] = tempm[4];
+		retval[5] = tempm[5];
+		retval[6] = tempm[6];
+		retval[7] = tempm[7];
+		
+		retval[8] = tempv1[8];
+		retval[9] = tempv1[9];
+		retval[10] = tempv1[10];
+		retval[11] = tempv1[11];
+		
+		retval[12] = tempv2[12];
+		retval[13] = tempv2[13];
+		retval[14] = tempv2[14];
+		retval[15] = tempv2[15];
 		
 		return retval;
 	}
