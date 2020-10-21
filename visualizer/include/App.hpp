@@ -8,7 +8,6 @@ public:
     static void init();
     static void update();
     static void draw();
-
 };
 
 #endif /* APP_HPP */

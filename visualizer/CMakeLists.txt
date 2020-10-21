@@ -5,8 +5,9 @@ project(visualizer CXX)
 file(GLOB sources src/* include/*)
 
 set(incl include)
-set(flags -Wall -g -std=c++17)
-set(libs -lX11 m)
+set(flags /W3 /std=c++17)
+#set(flags -Wall -g -std=c++17)
+#set(libs -lX11)
 
 # using vcpkg
 if (NOT ${CMAKE_TOOLCHAIN_FILE} STREQUAL "")
@@ -62,7 +63,7 @@ else ()
     	${SDL2_TTF_LIBRARIES}
 	    ${GLEW_LIBRARIES}
         ${ASSIMP_LIBRARIES}
-        m
+        #m
     )
 endif()
 

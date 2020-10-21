@@ -8,8 +8,8 @@
 #include "Shader.hpp"
 #include "Mesh.hpp"
 
-#define WIDTH 640
-#define HEIGHT 480
+#define WIDTH 1280
+#define HEIGHT 720
 
 using namespace mode7;
 
@@ -46,6 +46,9 @@ void draw()
     Screen::flip();
 }
 
+#ifdef main
+#undef main
+#endif
 int main()
 {
     std::cout << "hello world" << std::endl;
