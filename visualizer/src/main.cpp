@@ -7,6 +7,7 @@
 #include "Keyboard.hpp"
 #include "Shader.hpp"
 #include "Mesh.hpp"
+#include "Util.hpp"
 
 #define WIDTH 1280
 #define HEIGHT 720
@@ -53,8 +54,9 @@ int main()
 {
     std::cout << "hello world" << std::endl;
     
-    Screen::create(WIDTH, HEIGHT);
-    Camera::create(WIDTH, HEIGHT, 70, 1.f, 1000.f);
+    int sc = Util::getMonitorScale();
+    Screen::create(WIDTH * sc, HEIGHT * sc);
+    Camera::create(WIDTH * sc, HEIGHT * sc, 70, 1.f, 1000.f);
 
     Keyboard::attach();
 

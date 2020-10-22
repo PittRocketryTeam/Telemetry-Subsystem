@@ -3,9 +3,30 @@
 #include <ctime>
 #include <cstdlib>
 
+#ifdef __linux__
+#include <X11/Xlib.h>
+#endif
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 static glm::vec3 ax = { 1, 0, 0 };
 static glm::vec3 ay = { 0, 1, 0 };
 static glm::vec3 az = { 0, 0, 1 };
+
+int Util::getMonitorScale()
+{
+    int h;
+#ifdef _WIN32
+    h = GetSystemMetrics(SM_CYSCREEN);
+#elif defined __linux__
+    Display* d = XOpenDisplay(NULL);
+    Screen* s = DefaultScreenOfDisplay(d);
+    h = s->height;
+#endif
+
+    return h / 1080;
+}
 
 void Util::seed()
 {

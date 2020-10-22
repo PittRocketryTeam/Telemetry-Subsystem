@@ -5,8 +5,6 @@ project(visualizer CXX)
 file(GLOB sources src/* include/*)
 
 set(incl include)
-#set(flags -Wall -g -std=c++17)
-#set(libs -lX11)
 
 # using vcpkg
 if (NOT ${CMAKE_TOOLCHAIN_FILE} STREQUAL "")
