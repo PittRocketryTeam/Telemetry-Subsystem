@@ -27,7 +27,7 @@ void App::init()
     skybox.scale = glm::vec3(500.f);
     test_cube.position.z = -3.f;
 
-    ground = ModelLoader::open("assets/models/ground.dae");
+    ground = ModelLoader::open("assets/models/ground2.dae");
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
