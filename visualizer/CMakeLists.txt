@@ -5,13 +5,13 @@ project(visualizer CXX)
 file(GLOB sources src/* include/*)
 
 set(incl include)
-set(flags /W3 /std=c++17)
 #set(flags -Wall -g -std=c++17)
 #set(libs -lX11)
 
 # using vcpkg
 if (NOT ${CMAKE_TOOLCHAIN_FILE} STREQUAL "")
 
+    set(flags /W3 /std=c++17)
     message(STATUS "Using vcpkg")
 
     find_package(SDL2 CONFIG REQUIRED)
@@ -38,7 +38,8 @@ if (NOT ${CMAKE_TOOLCHAIN_FILE} STREQUAL "")
 else ()
 
     find_package(PkgConfig)
-
+    set(flags -Wall -g -std=c++17)
+    set(libs -lX11)
     pkg_check_modules(SDL2 REQUIRED sdl2)
     pkg_check_modules(SDL2_IMAGE REQUIRED SDL2_image)
     pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
