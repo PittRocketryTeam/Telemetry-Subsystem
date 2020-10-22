@@ -13,6 +13,7 @@ static Scene test_mesh;
 static Scene test_cube;
 static Scene skybox;
 static Scene rocket;
+static Scene ground;
 static Object dummy;
 static float x;
 
@@ -25,6 +26,10 @@ void App::init()
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
     test_cube.position.z = -3.f;
+
+    ground = ModelLoader::open("assets/models/ground.dae");
+    ground.scale = glm::vec3(250.f);
+    ground.position.y = -4;
 
     //test_mesh.addChild(&test_cube);
     dummy.addChild(&test_cube);
@@ -48,6 +53,7 @@ void App::update()
     test_mesh.update();
     dummy.update();
     skybox.update();
+    ground.update();
     
     Camera::lookAt(glm::vec3(-5, -2, -5), test_mesh.position);
     Camera::updateView();
@@ -56,6 +62,7 @@ void App::update()
 void App::draw()
 {
     skybox.draw(flat_shader);
+    ground.draw(flat_shader);
     test_mesh.draw(test_shader);
     test_cube.draw(test_shader);
 }
