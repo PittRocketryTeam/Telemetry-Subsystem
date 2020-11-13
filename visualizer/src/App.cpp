@@ -21,7 +21,9 @@ void App::init()
 {
     test_shader.open("assets/shaders/test_v.glsl", "assets/shaders/test_f.glsl");
     flat_shader.open("assets/shaders/flat_v.glsl", "assets/shaders/flat_f.glsl");
-    test_mesh = ModelLoader::open("assets/models/suzanne.dae");
+    test_mesh = ModelLoader::open("assets/models/vehicle.dae");
+    test_mesh.scale = glm::vec3(0.75f);
+    test_mesh.rotate(M_PI / 8.f, 0.f, 0.f);
     test_cube = ModelLoader::open("assets/models/test_cube.dae");
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
@@ -41,11 +43,11 @@ void App::update()
     Keyboard::poll();
     if (Keyboard::isDown(SDL_SCANCODE_LEFT))
     {
-        dummy.rotate(0.f, 0.1f, 0.f);
+        test_mesh.rotate(0.f, 0.1f, 0.f);
     }
     if (Keyboard::isDown(SDL_SCANCODE_RIGHT))
     {
-        dummy.rotate(0.f, -0.1f, 0.f);
+        test_mesh.rotate(0.f, -0.1f, 0.f);
     }
 
     test_mesh.position.y = -3.f;
@@ -55,7 +57,7 @@ void App::update()
     skybox.update();
     ground.update();
     
-    Camera::lookAt(glm::vec3(-5, -2, -5), test_mesh.position);
+    Camera::lookAt(glm::vec3(-15, 20, -15), test_mesh.position + glm::vec3(0, 10, 0));
     Camera::updateView();
 }
 
@@ -63,6 +65,6 @@ void App::draw()
 {
     skybox.draw(flat_shader);
     ground.draw(flat_shader);
-    test_mesh.draw(test_shader);
-    test_cube.draw(test_shader);
+    test_mesh.draw(flat_shader);
+    //test_cube.draw(test_shader);
 }
