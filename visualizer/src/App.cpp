@@ -17,8 +17,7 @@ static Scene ground;
 static Object dummy;
 static float x, y, z;
 static float radius, angle; 
-static bool crackHead, keyChange; 
-static glm::vec3 help; 
+static bool start, keyChange; 
 
 
 void App::init()
@@ -54,11 +53,11 @@ void App::update()
 
     Keyboard::poll();
     
-    if(Keyboard::isDown(SDL_SCANCODE_R) || !crackHead)
+    if(Keyboard::isDown(SDL_SCANCODE_R) || !start)
     {
         //Whenever the key R is pressed or the program started up, the camera will look at the default view 
         Camera::lookAt(glm::vec3(test_mesh.position.x, test_mesh.position.y, 20), test_mesh.position + glm::vec3(0, 10, 0));
-        crackHead = true; 
+        start = true; 
     }
     else if (Keyboard::isDown(SDL_SCANCODE_LEFT))
     {
