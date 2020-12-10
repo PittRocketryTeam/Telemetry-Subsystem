@@ -18,6 +18,7 @@ public:
     virtual std::string csv() = 0;
 
     int id;
+    int lt;
 };
 
 Packet::Packet()
@@ -60,6 +61,7 @@ HealthPacket::~HealthPacket()
 void HealthPacket::gendata(unsigned int t)
 {
     float s = (float)t / 1000.f;
+    lt = t;
     vbat = (int)roundf(1024.f * sinf(s));
     vr5 = (int)roundf(1024.f * sinf(s));
     vr3 = (int)roundf(1024.f * sinf(s));
@@ -71,7 +73,7 @@ std::string HealthPacket::csv()
 {
     std::stringstream ss;
 
-    ss << id << "," << vbat << "," << vr5 << "," << vr3 << "," << tbat << "," << amps;
+    ss << id << "," << lt << "," << vbat << "," << vr5 << "," << vr3 << "," << tbat << "," << amps;
 
     return ss.str();
 }
@@ -88,6 +90,8 @@ public:
     glm::vec3 accel;
     float vy;
     float alt;
+    float lon;
+    float lat;
     glm::vec3 omega;
     glm::quat quat;
 };
@@ -106,7 +110,10 @@ OrientationPacket::~OrientationPacket()
 void OrientationPacket::gendata(unsigned int t)
 {
     float s = (float)t / 1000.f;
-
+    
+    lt = t;
+    lon = 40.44424 + 0.1 * sinf(s);
+    lat = -79.95821 + 0.1 * cosf(s);
     accel.y = -9.8f;
     vy = 10000 + accel.y * s;
     alt = vy * s;
@@ -119,7 +126,9 @@ std::string OrientationPacket::csv()
 {
     std::stringstream ss;
 
-    ss << id << "," << accel.x << "," << accel.y << "," << accel.z << "," <<
+    ss << id << "," << lt << "," << 
+            lon << "," << lat << "," << 
+            accel.x << "," << accel.y << "," << accel.z << "," <<
             vy << "," << alt << "," <<
             omega.x << "," << omega.y << "," << omega.z << "," <<
             quat.w << "," << quat.x << "," << quat.y << "," << quat.z;
