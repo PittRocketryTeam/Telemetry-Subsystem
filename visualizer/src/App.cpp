@@ -20,6 +20,12 @@ static Data zeeData;
 
 //static float x, y, z;
 
+
+static Object vehicle_tracker;
+static Object camera_arm;
+static float x;
+
+
 void App::init()
 {
     test_shader.open("assets/shaders/test_v.glsl", "assets/shaders/test_f.glsl");
@@ -35,10 +41,20 @@ void App::init()
     ground = ModelLoader::open("assets/models/ground2.dae");
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
+
     zeeData.readData("../../test-data/data.csv");
     //test_mesh.addChild(&test_cube);
     dummy.addChild(&test_cube);
     test_mesh.addChild(&dummy);
+
+
+    // the camera arm holds the camera a distance of 50 away from the vehicle
+    camera_arm.addChild(&Camera::getObject());
+    camera_arm.position.z = 50.f;
+    // the vehicle tracker is just a point in space that follows the vehicle
+    vehicle_tracker.addChild(&camera_arm);
+}
+
 
 }
  
@@ -53,6 +69,49 @@ void App::update()
     ground.update();
     test_mesh.update();
     Camera::updateView();  
+
+    Keyboard::poll();
+    if (Keyboard::isDown(SDL_SCANCODE_LEFT))
+    {
+        vehicle_tracker.rotate(0.f, 0.1f, 0.f);
+    }
+    if (Keyboard::isDown(SDL_SCANCODE_RIGHT))
+    {
+        vehicle_tracker.rotate(0.f, -0.1f, 0.f);
+    }
+    if (Keyboard::isDown(SDL_SCANCODE_UP))
+    {
+        vehicle_tracker.rotate(0.1f, 0.f, 0.f);
+    }
+    if (Keyboard::isDown(SDL_SCANCODE_DOWN))
+    {
+        vehicle_tracker.rotate(-0.1f, 0.f, 0.f);
+    }
+
+    // this block just clamps the x rotation
+    float thx = glm::eulerAngles(vehicle_tracker.rx).x;
+    if (thx > 0.f && thx <= M_PI_2)
+    {
+        vehicle_tracker.setRotationX(M_PI_2);
+    }
+    else if (thx < 0.f && thx > -M_PI_2)
+    {
+        vehicle_tracker.setRotationX(-M_PI_2);
+    }
+
+    test_mesh.position.y = -3.f;
+
+    // make the vehicle tracker follow the vehicle
+    vehicle_tracker.position = test_mesh.position;
+
+    test_mesh.update();
+    vehicle_tracker.update();
+    skybox.update();
+    ground.update();
+    
+    //Camera::lookAt(glm::vec3(-15, 20, -15), test_mesh.position + glm::vec3(0, 10, 0));
+    Camera::updateView();
+
 }
 
 void App::draw()
