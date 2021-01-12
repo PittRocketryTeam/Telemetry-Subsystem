@@ -14,10 +14,9 @@ Data::~Data()
 
 }
 
-
-void Data::getHealthpacket()
+void Data::getHealthPacket()
 {
-    
+
 }
 
 void Data::getOrientationPacket()
@@ -27,21 +26,18 @@ void Data::getOrientationPacket()
 
 void Data::readData(std::string path)
 {
-    std::string packet; 
-     std::cout << "DID324" << std::endl; 
-    // Read from the text file
+    std::string packet;  
+    // Read from the .csv file
     std::ifstream MyReadFile(path);
 
     // Use a while loop together with the getline() function to read the file line by line
     while (std::getline(MyReadFile, packet)) {
-        // Output the text from the file
+        // Push data info into queue. 
         data.push(packet);
     }
 
-    // Close the file
+    // Close the .csv file
     MyReadFile.close();
-
-    std::cout << isEmpty() << std::endl; 
 }
 
 bool Data::isEmpty()
@@ -49,17 +45,22 @@ bool Data::isEmpty()
     return data.empty(); 
 }
 
-void Data::pollData()
+std::vector<float> Data::pollData()
 {
     if(!isEmpty())
     {
-        std::cout << data.front() << std::endl; 
-        data.pop(); //Remove front item 
+        //Version One 
+        std::vector<float> packet; 
+        std::stringstream s(data.front()); 
+        std::string val; 
+        while(std::getline(s, val, ','))
+        {
+            packet.push_back(stof(val)); 
+        }
+        data.pop(); 
+        return packet; 
     }
-    else
-    {
-        std::cout << "Queue is empty." << std::endl; 
-    }
+    std::cout << "Queue is empty." << std::endl;
 }
 
 

@@ -53,7 +53,6 @@ void App::update()
     ground.update();
     test_mesh.update();
     Camera::updateView();  
-    zeeData.pollData(); 
 }
 
 void App::draw()

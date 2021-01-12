@@ -15,11 +15,11 @@ public:
     Data(); 
     ~Data(); 
  
-    void getHealthpacket();
+    void getHealthPacket();
     void getOrientationPacket();
     void readData(std::string); 
     bool isEmpty(); 
-    void pollData(); 
+    std::vector<float> pollData(); 
     
 private:
     std::queue<std::string> data; 
