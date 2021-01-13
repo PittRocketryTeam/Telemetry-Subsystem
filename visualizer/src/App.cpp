@@ -2,6 +2,7 @@
 #include "Shader.hpp"
 #include "Mesh.hpp"
 #include "ModelLoader.hpp"
+#include "Data.hpp"
 #include "Camera.hpp"
 #include "Keyboard.hpp"
 
@@ -14,10 +15,16 @@ static Scene test_cube;
 static Scene skybox;
 static Scene rocket;
 static Scene ground;
+static Object dummy;
+static Data zeeData;  
+
+//static float x, y, z;
+
 
 static Object vehicle_tracker;
 static Object camera_arm;
 static float x;
+
 
 void App::init()
 {
@@ -25,7 +32,7 @@ void App::init()
     flat_shader.open("assets/shaders/flat_v.glsl", "assets/shaders/flat_f.glsl");
     test_mesh = ModelLoader::open("assets/models/vehicle.dae");
     test_mesh.scale = glm::vec3(0.75f);
-    test_mesh.rotate(M_PI / 8.f, 0.f, 0.f);
+    //test_mesh.rotate(M_PI / 8.f, 0.f, 0.f);
     test_cube = ModelLoader::open("assets/models/test_cube.dae");
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
@@ -35,6 +42,12 @@ void App::init()
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
+    zeeData.readData("../../test-data/data.csv");
+    //test_mesh.addChild(&test_cube);
+    dummy.addChild(&test_cube);
+    test_mesh.addChild(&dummy);
+
+
     // the camera arm holds the camera a distance of 50 away from the vehicle
     camera_arm.addChild(&Camera::getObject());
     camera_arm.position.z = 50.f;
@@ -42,8 +55,21 @@ void App::init()
     vehicle_tracker.addChild(&camera_arm);
 }
 
+
+}
+ 
 void App::update()
 {
+    //test_mesh.position.x = radius * cosf(angle); 
+    //test_mesh.position.y = radius * sinf(angle);
+    //Keyboard::poll();
+    Camera::lookAt(glm::vec3(test_mesh.position.x, test_mesh.position.y, 5), test_mesh.position);        
+    dummy.update();
+    skybox.update();
+    ground.update();
+    test_mesh.update();
+    Camera::updateView();  
+
     Keyboard::poll();
     if (Keyboard::isDown(SDL_SCANCODE_LEFT))
     {
@@ -85,6 +111,7 @@ void App::update()
     
     //Camera::lookAt(glm::vec3(-15, 20, -15), test_mesh.position + glm::vec3(0, 10, 0));
     Camera::updateView();
+
 }
 
 void App::draw()
