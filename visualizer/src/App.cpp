@@ -49,19 +49,35 @@ void App::update()
     {
         vehicle_tracker.rotate(0.f, 0.1f, 0.f);
     }
-    if (Keyboard::isDown(SDL_SCANCODE_RIGHT))
+    else if (Keyboard::isDown(SDL_SCANCODE_RIGHT))
     {
         vehicle_tracker.rotate(0.f, -0.1f, 0.f);
     }
-    if (Keyboard::isDown(SDL_SCANCODE_UP))
+    else if (Keyboard::isDown(SDL_SCANCODE_UP))
     {
-        vehicle_tracker.rotate(0.1f, 0.f, 0.f);
+        camera_arm.position.z -= 1.f;
     }
-    if (Keyboard::isDown(SDL_SCANCODE_DOWN))
+    else if (Keyboard::isDown(SDL_SCANCODE_DOWN))
     {
-        vehicle_tracker.rotate(-0.1f, 0.f, 0.f);
+        camera_arm.position.z += 1.f;
     }
-
+    else if (Keyboard::isDown(SDL_SCANCODE_A))
+    {
+        camera_arm.position.x -= 1.f;
+    }
+    else if (Keyboard::isDown(SDL_SCANCODE_D))
+    {
+        camera_arm.position.x += 1.f;
+    }
+    else if (Keyboard::isDown(SDL_SCANCODE_W))
+    {
+        camera_arm.position.y += 1.f;
+    }
+    else if (Keyboard::isDown(SDL_SCANCODE_S))
+    {
+        camera_arm.position.y -= 1.f;
+    }
+    
     // this block just clamps the x rotation
     float thx = glm::eulerAngles(vehicle_tracker.rx).x;
     if (thx > 0.f && thx <= M_PI_2)
