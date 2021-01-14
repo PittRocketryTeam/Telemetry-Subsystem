@@ -78,6 +78,7 @@ void mode7::Screen::create(int w, int h)
     glDepthFunc(GL_LESS);
     glClearColor(0.7f, 0.7f, 0.8f, 1.0f);
 
+#ifdef _USE_FB
     // load screen shader
     screenShader.open(
         "assets/shaders/screen_v.glsl",
@@ -129,6 +130,7 @@ void mode7::Screen::create(int w, int h)
         4 * sizeof(float),
         (void*)(2 * sizeof(float))
     );
+#endif
 }
 
 void mode7::Screen::clear()
@@ -138,7 +140,9 @@ void mode7::Screen::clear()
 
 void mode7::Screen::beginRender()
 {
+#ifdef _USE_FB
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+#endif
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -147,6 +151,7 @@ void mode7::Screen::beginRender()
 
 void mode7::Screen::flip()
 {
+#ifdef _USE_FB
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glViewport(0, 0, width, height);
     /*glBlitFramebuffer(
@@ -168,12 +173,15 @@ void mode7::Screen::flip()
     
     glActiveTexture(0);
     glBindVertexArray(0);
+#endif
     
     SDL_GL_SwapWindow(window);
 }
 
 void mode7::Screen::destroy()
 {
+#ifdef _USE_FB
     glDeleteFramebuffers(1, &fbo);
+#endif
     SDL_DestroyWindow(window);
 }
