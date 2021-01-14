@@ -40,7 +40,6 @@ void mode7::Screen::create(int w, int h)
     RESX = w;
     RESY = h;
 
-    //SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 
     //SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -56,6 +55,8 @@ void mode7::Screen::create(int w, int h)
     SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 16);
     SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
     SDL_GL_SetSwapInterval(0);
+
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     window = SDL_CreateWindow(
         "title",
