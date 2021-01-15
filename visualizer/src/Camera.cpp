@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include <iostream>
 
 namespace mode7
 {
@@ -9,6 +10,8 @@ Object Camera::object;
 
 void Camera::create(float w, float h, float fov, float n, float f)
 {
+    std::cout << "CREATE CAMERA: " << w << "," << h << "," << fov << "," << n << "," << f << std::endl;
+    assert(h > 0.f);
     projection = glm::perspective(glm::radians(fov), w / h, n, f);
 }
 

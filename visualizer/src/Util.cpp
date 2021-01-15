@@ -25,7 +25,9 @@ int Util::getMonitorScale()
     h = s->height;
 #endif
 
-    return h / 1080;
+    h /= 1080;
+    if (h == 0) h = 1;
+    return h;
 }
 
 void Util::seed()
