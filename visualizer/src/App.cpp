@@ -55,8 +55,6 @@ void App::init()
     vehicle_tracker.addChild(&camera_arm);
 }
 
-
-}
  
 void App::update()
 {

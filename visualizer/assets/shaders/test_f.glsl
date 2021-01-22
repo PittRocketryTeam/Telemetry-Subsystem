@@ -1,5 +1,6 @@
-#version 330 core
-
+//#version 330 core
+#version 300 es
+precision highp float;
 in vec2 uv;
 in vec3 n;
 out vec4 color;
