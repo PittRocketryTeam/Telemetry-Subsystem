@@ -37,13 +37,16 @@ class device:
 	# get the port connected to the MCU
 	def get_MCU_port(self, name):
 		ports = self.get_ports()
+		print(ports)
 		ret = "NONE"
 		for port in ports:
 			port = str(port)
 			if port.find(name) != -1:
-				#ret = port.split(' ')[0]
-				ret = port.strip()
-				ret = ret[ret.find("\'")+1:ret.find("\'", 3)]
+				ret = port.split(' ')[0]
+				#ret = port.strip()
+				print(ret)
+				#ret = ret[0:4]#ret = ret[ret.find("\'")+1:ret.find("\'", 4)]
+				print(ret)
 		return ret
 
 	# sets baud rate for serial connection

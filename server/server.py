@@ -115,13 +115,14 @@ def run_server(args):
 					#the main loop -- figure out how much 
 					while True:
 						rocket_data = teensy.read()
+						print(rocket_data)
 						#	break
 						if not rocket_data: 
 							c_conn.sendall('No Serial Data'.encode('UTF-8'))
 						else:
 							c_conn.sendall(rocket_data)
 						command = c_conn.recv(1024) # receive commands
-						print(command.hex())
+						print("command.hex:", command.hex())
 						teensy.write(command)
 
 				# allow the sockets to close naturally from the 'with' statments if the server is abruptly shutdown
@@ -134,12 +135,14 @@ def run_server(args):
 if __name__ == "__main__":
 	#print(sys.argv[1:])
 	args = parse_args(sys.argv[1:])
-	#run_server(args)
+	run_server(args)
 
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as csock:
+"""	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as csock:
 		csock.bind(COSMOS_ADDRESS)
 		print("Going to listen for COSMOS connection")
 		csock.listen(0)
 		print("Ltistened COSMOS connection")
 		c_conn, addr = csock.accept()
 		print("Accept COSMOS connection")
+		while True:
+			pass"""
