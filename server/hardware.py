@@ -60,8 +60,12 @@ class device:
 
 	# return the contents in the serial input queue
 	def read(self):
-		num_available_bytes = self.ser.inWaiting()
-		return self.ser.read(num_available_bytes)
+		if self.is_connected():
+			num_available_bytes = self.ser.inWaiting()
+			return self.ser.read(num_available_bytes)
+		else:
+			print("Serial port not open")
+			return 0
 
 	# write the data out to the serial port
 	def write(self, data):
