@@ -12,7 +12,7 @@ class device:
 
 	# delete and close port
 	def __del__(self):
-		self.disconnect()
+		self.ser.__del__()
 
 	# returns true if comm channel is open, false if closed 
 	def is_connected(self):
@@ -28,11 +28,7 @@ class device:
 			self.ser.open()
 			print("MCU Connected")
 		else:
-			print("Error: No MCU Connected")
-
-	# closes serial port communications
-	def disconnect(self):
-		self.ser.close()
+			print("Connection Error -- No MCU Connected")
 
 	# return a list of communication ports
 	def get_ports(self):
@@ -54,7 +50,7 @@ class device:
 	def set_baud_rate(self, rate):
 		self.ser.baudrate = rate
 
-    # returns baud rate of serial connection
+	# returns baud rate of serial connection
 	def get_baud_rate(self):
 		if self.is_connected():
 			return self.ser.baudrate
@@ -67,14 +63,25 @@ class device:
 		num_available_bytes = self.ser.inWaiting()
 		return self.ser.read(num_available_bytes)
 
-	# write the data out to the serial port 
+	# write the data out to the serial port
 	def write(self, data):
-		if self.ser.writable():
-			try:
-				self.ser.write(str(data).encode('UTF-8'))
-			except Exception as e:
-				print("Could not write data to serial -- ", e)
+		'''
+		see if theres a connection, if the port is writeable, 
+		then if the data type is bytes to optimize conversion
+		'''
+		if self.is_connected():
+			if self.ser.writable():
+				try:
+					if type(data) is bytes:
+						return self.ser.write(data)
+					else:
+						return self.ser.write(str(data).encode('UTF-8'))
+				except Exception as e:
+					print("Could not write data to serial -- ", e)
+					return 0
+			else:
+				print("Serial port not writable")
 				return 0
 		else:
-			print("Serial port not writable")
+			print("Serial port not open")
 			return 0
