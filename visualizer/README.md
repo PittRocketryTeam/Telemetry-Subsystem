@@ -6,7 +6,7 @@
 
    - Virtual Box is a hypervisor (a piece of software) that runs on top of your operating system and allows you to create a virtual machine (VM) .
 
-**2.** Download the virtual hard drive [soar_vm.qcow2](https://drive.google.com/file/d/1SWaaq6ijOfP_IqaYz-DkRoniXE-CZMbI/view?usp=sharing)
+**2.** Download the virtual hard drive [soar_vm.qcow2](https://mega.nz/file/MP4inJRI#SsqFDn-Ordc9cEUt1QtwAAlqP3Tg8FSQSDG1eoB7kpQ)
 
    - The virtual hard drive will contain the telemetry-subsystem software to run on your VM. Note you will need the [7zip software](https://www.7-zip.org/download.html) to extract the contents of the zip file.
     
@@ -26,7 +26,7 @@
       ```console
       cd Desktop/repos/Telemetry-Subsystem/visualizer/build
       ```
-      Generate a makefile.
+      Generate a makefile/update assets folder.
       ```console
       cmake ..
       ```
