@@ -116,6 +116,7 @@ def run_server(args):
 					if rocket_data:
 						print("Rocket data:", rocket_data)
 						c_conn.sendall(rocket_data)
+						v_conn.sendall(rocket_data)
 					else:
 						print("No rocket data")
 					#command = c_conn.recv(1024) # receive commands
@@ -172,6 +173,33 @@ def run_server(args):
 				cosmos_proc.join()
 				c_conn.shutdown(SHUT_RDWR)
 				c_conn.close()
+		elif run_visualizer:
+			print('Connected by', vaddr)
+			try:
+				#the main loop -- figure out how much 
+				while True:
+					rocket_data = teensy.read()
+					#print("Rocket data:", rocket_data)
+					#	break
+					#if not rocket_data: 
+					#	c_conn.sendall('No Serial Data'.encode('UTF-8'))
+					#else:
+					#	c_conn.sendall(rocket_data)
+					if rocket_data:
+						print("Rocket data:", rocket_data)
+						v_conn.sendall(rocket_data)
+					else:
+						print("No rocket data")
+
+			# allow the sockets to close naturally from the 'with' statments if the server is abruptly shutdown
+			except KeyboardInterrupt:
+				pass
+			except ConnectionResetError: 
+				print("\nConnection Ended")
+			finally:
+				# shutdown and accept no further sends or receives. shutdown allows close() to be completed quickly
+				v_conn.shutdown(SHUT_RDWR)
+				v_conn.close()
 	#cosmos_proc.join()
 	except KeyboardInterrupt:
 		print()
