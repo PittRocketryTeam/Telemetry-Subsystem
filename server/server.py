@@ -3,7 +3,8 @@
 import socket
 import socketserver
 import sys
-import multiprocessing as mp
+#import multiprocessing as mp
+from multiprocessing import Process, Queue
 import threading
 from hardware import device
 
@@ -35,9 +36,16 @@ def serial_listen():
 	while True:
 		pass
 '''
+
+def get_command(c_conn, command_queue, command_event):
+	#put in job queue so it can be retrieved by the main process
+	while not command_event.is_set():
+		command = c_conn.recv(1024) # receive commands
+		command_queue.put(command)
+
 def parse_args(args):
-	print(args)
-	print("-v" in args)
+	#print(args)
+	#print("-v" in args)
 	retval = [False, False]
 	if args == []:
 		retval[0] = True
@@ -61,13 +69,17 @@ def run_server(args):
 
 	'''
 	print("Server Starting")
-	print(args)
+	print("args:", args)
 
 	run_cosmos = args[0]
 	run_visualizer = args[1]
 
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as csock, socket.socket(socket.AF_INET, socket.SOCK_STREAM) as vsock:
+	#with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as csock, socket.socket(socket.AF_INET, socket.SOCK_STREAM) as vsock:
 
+	try:
+		csock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		vsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		
 		# establish the COSMOS conneciton
 		if run_cosmos:
 			csock.bind(COSMOS_ADDRESS)
@@ -76,6 +88,10 @@ def run_server(args):
 			print("Found COSMOS connection")
 			c_conn, addr = csock.accept()
 			print("Accept COSMOS connection")
+			command_queue = Queue()
+			command_event = threading.Event()
+			command_event.clear()
+			cosmos_proc = Process(target=get_command, args=(c_conn, command_queue, command_event))
 
 		# establish the visualizer connection
 		if run_visualizer:
@@ -85,52 +101,84 @@ def run_server(args):
 
 		# continue with the connections
 		if run_cosmos and run_visualizer:
-			with c_conn, v_conn:
-				print('Connected by', addr, 'and', vaddr)
-				try:
-					#the main loop -- figure out how much 
-					while True:
-						cdata = c_conn.recv(1024)
-						v_conn.sendall(cdata)
-						#vdata = v_conn.recv(1024)
-						#if not cdata and not vdata: break
-						if not cdata: 
-							break
-						else:
-							print(cdata.hex())
-						#if vdata:
-						#	print("\t", vdata.hex())
-						#print(cdata.hex(), "\n", vdata.hex())
-						#c_conn.sendall(data)
-
-				# allow the sockets to close naturally from the 'with' statments if the server is abruptly shutdown
-				except KeyboardInterrupt:
-					pass
-				except ConnectionResetError: 
-					print("\nConnection Ended")
-		elif run_cosmos:
-			with c_conn:
-				print('Connected by', addr)
-				try:
-					#the main loop -- figure out how much 
-					while True:
-						rocket_data = teensy.read()
-						print(rocket_data)
-						#	break
-						if not rocket_data: 
-							c_conn.sendall('No Serial Data'.encode('UTF-8'))
-						else:
-							c_conn.sendall(rocket_data)
-						command = c_conn.recv(1024) # receive commands
+			print('Connected by', addr, 'and', vaddr)
+			cosmos_proc.start()
+			try:
+				#the main loop -- figure out how much 
+				while True:
+					rocket_data = teensy.read()
+					#print("Rocket data:", rocket_data)
+					#	break
+					#if not rocket_data: 
+					#	c_conn.sendall('No Serial Data'.encode('UTF-8'))
+					#else:
+					#	c_conn.sendall(rocket_data)
+					if rocket_data:
+						print("Rocket data:", rocket_data)
+						c_conn.sendall(rocket_data)
+					else:
+						print("No rocket data")
+					#command = c_conn.recv(1024) # receive commands
+					#check job queue, send to rocket if there's anything
+					if not command_queue.empty():
+						command = command_queue.get()
 						print("command.hex:", command.hex())
 						teensy.write(command)
 
-				# allow the sockets to close naturally from the 'with' statments if the server is abruptly shutdown
-				except KeyboardInterrupt:
-					pass
-				except ConnectionResetError: 
-					print("\nConnection Ended")
-	print("Exiting Server")
+			# allow the sockets to close naturally from the 'with' statments if the server is abruptly shutdown
+			except KeyboardInterrupt:
+				pass
+			except ConnectionResetError: 
+				print("\nConnection Ended")
+			finally: 
+				command_event.set()
+				cosmos_proc.join()
+				# shutdown and accept no further sends or receives. shutdown allows close() to be completed quickly
+				c_conn.shutdown(SHUT_RDWR) 
+				c_conn.close()
+				v_conn.shutdown(SHUT_RDWR)
+				v_conn.close()
+		elif run_cosmos:
+			print('Connected by', addr)
+			cosmos_proc.start()
+			try:
+				#the main loop -- figure out how much 
+				while True:
+					rocket_data = teensy.read()
+					#print("Rocket data:", rocket_data)
+					#	break
+					#if not rocket_data: 
+					#	c_conn.sendall('No Serial Data'.encode('UTF-8'))
+					#else:
+					#	c_conn.sendall(rocket_data)
+					if rocket_data:
+						print("Rocket data:", rocket_data)
+						c_conn.sendall(rocket_data)
+					else:
+						print("No rocket data")
+					#command = c_conn.recv(1024) # receive commands
+					#check job queue, send to rocket if there's anything
+					if not command_queue.empty():
+						command = command_queue.get()
+						print("command.hex:", command.hex())
+						teensy.write(command)
+
+			except KeyboardInterrupt:
+				pass
+			except ConnectionResetError: 
+				print("\nConnection Ended")
+			finally:
+				command_event.set()
+				cosmos_proc.join()
+				c_conn.shutdown(SHUT_RDWR)
+				c_conn.close()
+	#cosmos_proc.join()
+	except KeyboardInterrupt:
+		print()
+	finally:
+		csock.close()
+		vsock.close()
+		print("Exiting Server")
 
 if __name__ == "__main__":
 	#print(sys.argv[1:])
