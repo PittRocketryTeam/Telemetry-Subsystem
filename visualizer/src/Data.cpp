@@ -49,7 +49,6 @@ std::vector<float> Data::pollData()
 {
     if(!isEmpty())
     {
-        //Version One 
         std::vector<float> packet; 
         std::stringstream s(data.front()); 
         std::string val; 
