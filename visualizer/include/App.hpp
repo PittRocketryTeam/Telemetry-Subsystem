@@ -8,6 +8,8 @@ public:
     static void init();
     static void update();
     static void draw();
+    static void checkKeyboardMovement(); 
+    static void addCheckPoint();
 };
 
 #endif /* APP_HPP */
