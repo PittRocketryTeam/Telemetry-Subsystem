@@ -6,8 +6,8 @@
 class Client
 {
 public:
-    static void connect();
-    static void disconnect();
+    static void con();
+    static void disconnect(int);
     static std::vector<float> getPacket();
 };
 
