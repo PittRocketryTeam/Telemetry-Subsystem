@@ -16,7 +16,7 @@ class device:
 
 	# returns true if comm channel is open, false if closed 
 	def is_connected(self):
-		return self.ser.is_open()
+		return self.ser.isOpen()
 
 	# connects to connected mcu
 	def connect(self, name="USB"):
@@ -41,9 +41,11 @@ class device:
 		for port in ports:
 			port = str(port)
 			if port.find(name) != -1:
-				#ret = port.split(' ')[0]
-				ret = port.strip()
-				ret = ret[ret.find("\'")+1:ret.find("\'", 3)]
+				ret = port.split(' ')[0]
+				#ret = port.strip()
+				#print(ret)
+				#ret = ret[0:4]#ret = ret[ret.find("\'")+1:ret.find("\'", 4)]
+				#print(ret)
 		return ret
 
 	# sets baud rate for serial connection
@@ -65,7 +67,7 @@ class device:
 			return self.ser.read(num_available_bytes)
 		else:
 			print("Serial port not open")
-			return 0
+			return None
 
 	# write the data out to the serial port
 	def write(self, data):

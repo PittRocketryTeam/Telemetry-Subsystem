@@ -28,12 +28,13 @@ public:
     Mesh();
     virtual ~Mesh();
 
-    void init();
     void setMaterial(Material&);
     void createFromBuffer(const float*, GLuint);
     void createFromArrays(std::vector<Vertex>&, std::vector<unsigned int>&);
     void createFromShape(int);
     void drawTriangles();
+    void drawLines(std::vector<glm::vec3>&, GLuint); 
+    void drawLine(Shader&, GLuint); 
     virtual void draw(Shader&);
     void setAltShader(Shader&);
     

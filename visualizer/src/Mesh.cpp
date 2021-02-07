@@ -186,6 +186,37 @@ void Mesh::setAltShader(Shader& s)
     alt = &s;
 }
 
+void Mesh::drawLines(std::vector<glm::vec3>& points, GLuint amt)
+{
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, amt * sizeof(glm::vec3), &points[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(
+        0, 3,
+        GL_FLOAT,
+        GL_FALSE,
+        3 * sizeof(float),
+        (void*)0
+    );
+
+}
+
+void Mesh::drawLine(Shader& s, GLuint amt)
+{
+    s.use();
+    s.setModel(*this);
+
+    glBindVertexArray(vao);
+    glDrawArrays(GL_LINE_STRIP, 0, amt); 
+    glBindVertexArray(0);
+}
+
 void Mesh::drawTriangles()
 {
     glBindVertexArray(vao);
