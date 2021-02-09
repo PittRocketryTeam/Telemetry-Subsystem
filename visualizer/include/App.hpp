@@ -10,6 +10,7 @@ public:
     static void draw();
     static void checkKeyboardMovement(); 
     static void addCheckPoint();
+    static void motorBurnout(); 
 };
 
 #endif /* APP_HPP */

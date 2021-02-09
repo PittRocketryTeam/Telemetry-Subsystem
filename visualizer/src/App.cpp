@@ -17,26 +17,27 @@ static Scene test_cube;
 static Scene skybox;
 static Scene rocket;
 static Scene ground;
-static Object dummy;
+static Scene flame; 
 static Data zeeData;  
 
 static Object vehicle_tracker;
 static Object camera_arm;
 static std::vector<glm::vec3> path; 
 static Mesh what_mesh; 
-static Scene what_scene; 
 static int counter; 
-static float x;
-
+static bool burnout; 
 
 void App::init()
-{
+{ 
     test_shader.open("assets/shaders/test_v.glsl", "assets/shaders/test_f.glsl");
     flat_shader.open("assets/shaders/flat_v.glsl", "assets/shaders/flat_f.glsl");
     line_shader.open("assets/shaders/path_v.glsl", "assets/shaders/path_f.glsl"); 
     
     test_mesh = ModelLoader::open("assets/models/vehicle.dae");
     test_mesh.scale = glm::vec3(0.75f);
+
+    flame = ModelLoader::open("assets/models/flame.dae");
+    test_mesh.addChild(&flame); 
 
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
@@ -54,8 +55,6 @@ void App::init()
     vehicle_tracker.addChild(&camera_arm);
 
     test_cube = ModelLoader::open("assets/models/test_cube.dae");
-
-    
 }
 
 void App::checkKeyboardMovement()
@@ -111,40 +110,41 @@ void App::checkKeyboardMovement()
     vehicle_tracker.position = test_mesh.position;
 }
 
+void App::motorBurnout()
+{
+    burnout = true; //a flag to stop further draw calls
+    flame.position = glm::vec3(0, -100, 0); //set flame object out of view 
+}
 
 void App::addCheckPoint()
 {
     glm::vec3 new_point = test_mesh.position; //Get new point
     //path.push_back(*path.end()); 
     path.push_back(new_point); //add new coordinate
-    GLuint amt = path.size(); 
-
-    std::cout << "amt: " << amt << std::endl;
-
-    what_mesh.drawLines(path, amt);  
+    //std::cout << "amt: " << amt << std::endl;
+    what_mesh.drawLines(path, path.size());  
 }
 
 void App::update()
 {
-    test_mesh.position.y += 0.2f; 
-    std::cout << test_mesh.position.y << std::endl;
-    // dummy.update();
+    test_mesh.position.y += 0.2f;
+    flame.position = test_mesh.position;  
+    // std::cout << test_mesh.position.y << std::endl;
+
     test_mesh.update();
     test_cube.update();
-    
+    flame.update(); 
     vehicle_tracker.position = test_mesh.position;
     vehicle_tracker.update();
     skybox.update();
     ground.update();
     checkKeyboardMovement();
-
     if(counter == 5)
     {
         addCheckPoint(); 
         counter = 0; 
     }
     counter += 1; 
-
     Camera::updateView();
 }
 
@@ -153,6 +153,10 @@ void App::draw()
     skybox.draw(flat_shader);
     ground.draw(flat_shader);
     test_mesh.draw(flat_shader);
-    test_cube.draw(test_shader);
+    if(!burnout)
+    {
+        flame.draw(test_shader); 
+    }
     what_mesh.drawLine(line_shader, path.size()); 
+   
 }
