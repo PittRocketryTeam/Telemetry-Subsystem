@@ -37,6 +37,7 @@ void App::init()
     test_mesh.scale = glm::vec3(0.75f);
 
     flame = ModelLoader::open("assets/models/flame.dae");
+    flame.scale = glm::vec3(1.0f); 
     test_mesh.addChild(&flame); 
 
     skybox = ModelLoader::open("assets/models/skybox.dae");
@@ -46,7 +47,7 @@ void App::init()
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
-    // zeeData.readData("../../test-data/data.csv");
+    zeeData.readData("../../test-data/data.csv");
 
     // the camera arm holds the camera a distance of 50 away from the vehicle
     camera_arm.addChild(&Camera::getObject());
@@ -127,13 +128,18 @@ void App::addCheckPoint()
 
 void App::update()
 {
-    test_mesh.position.y += 0.2f;
-    flame.position = test_mesh.position;  
-    // std::cout << test_mesh.position.y << std::endl;
+    zeeData.pollData(); //health packet 
+    std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
+    test_mesh.quat = glm::quat(orientation_pkt[12], orientation_pkt[15], orientation_pkt[13], orientation_pkt[14]); 
+    //std::cout << "W: " << orientation_pkt[12] << " X: " << orientation_pkt[13] << " Y: " << orientation_pkt[14] << " Z: " << orientation_pkt[15] << std::endl; 
+    test_mesh.position.y += 0.01f;
+    flame.position = test_mesh.position; 
+    flame.quat = test_mesh.quat;  
+    //std::cout << test_mesh.position.x << std::endl;
 
-    test_mesh.update();
+    test_mesh.update(1); //use test_mesh.update(1) to do a quaternion rotation 
     test_cube.update();
-    flame.update(); 
+    flame.update(1); //rotate the same way as test_mesh
     vehicle_tracker.position = test_mesh.position;
     vehicle_tracker.update();
     skybox.update();
