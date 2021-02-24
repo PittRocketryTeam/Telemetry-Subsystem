@@ -25,7 +25,8 @@ static Object camera_arm;
 static std::vector<glm::vec3> path; 
 static Mesh what_mesh; 
 static int counter; 
-static bool burnout; 
+static bool burnout, initial_position; 
+static float px, pz, x, z; 
 
 void App::init()
 { 
@@ -37,8 +38,8 @@ void App::init()
     test_mesh.scale = glm::vec3(0.75f);
 
     flame = ModelLoader::open("assets/models/flame.dae");
-    flame.scale = glm::vec3(1.0f); 
-    test_mesh.addChild(&flame); 
+    //flame.scale = glm::vec3(1.0f); 
+    test_mesh.addChild(&flame); //won't rotate with quaternion if this line enabled; ill fix it later
 
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
@@ -47,7 +48,7 @@ void App::init()
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
-    zeeData.readData("../../test-data/data.csv");
+    zeeData.readData("../../test-data/s_data.csv");
 
     // the camera arm holds the camera a distance of 50 away from the vehicle
     camera_arm.addChild(&Camera::getObject());
@@ -128,18 +129,32 @@ void App::addCheckPoint()
 
 void App::update()
 {
-    zeeData.pollData(); //health packet 
-    std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
-    test_mesh.quat = glm::quat(orientation_pkt[12], orientation_pkt[15], orientation_pkt[13], orientation_pkt[14]); 
-    //std::cout << "W: " << orientation_pkt[12] << " X: " << orientation_pkt[13] << " Y: " << orientation_pkt[14] << " Z: " << orientation_pkt[15] << std::endl; 
-    test_mesh.position.y += 0.01f;
-    flame.position = test_mesh.position; 
-    flame.quat = test_mesh.quat;  
-    //std::cout << test_mesh.position.x << std::endl;
+    if(!zeeData.isEmpty())
+    {
+        std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
+        if(!initial_position)
+        { //Only need x and z to determine where the rocket is heading
+            px = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000;
+            pz = sinf(orientation_pkt[1]) * 1000000;
+            initial_position = true; 
+        }
+        x = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000; //cos(latitude) * cos(latitude)
+        z = sinf(orientation_pkt[1]) * 1000000; //sin(latitude)
+        
+        test_mesh.position += (glm::vec3((x - px) * 0.05, 0, (z-pz) * 0.05)); //Scale
+        test_mesh.position.y = (orientation_pkt[0] * (470.f/10000)); //Scale
 
-    test_mesh.update(1); //use test_mesh.update(1) to do a quaternion rotation 
+        px = x; 
+        pz = z; 
+    }
+    //test_mesh.quat = glm::quat(orientation_pkt[12], orientation_pkt[15], orientation_pkt[13], orientation_pkt[14]); 
+    
+    //flame.position = test_mesh.position; 
+    //flame.quat = test_mesh.quat;  
+
+    test_mesh.update(); //use test_mesh.update(1) to do a quaternion rotation 
     test_cube.update();
-    flame.update(1); //rotate the same way as test_mesh
+    //flame.update(1); //rotate the same way as test_mesh; not updating correctly; don't know why
     vehicle_tracker.position = test_mesh.position;
     vehicle_tracker.update();
     skybox.update();

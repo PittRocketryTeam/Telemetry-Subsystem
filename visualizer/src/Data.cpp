@@ -50,11 +50,19 @@ std::vector<float> Data::pollData()
     if(!isEmpty())
     {
         std::vector<float> packet; 
+        
         std::stringstream s(data.front()); 
         std::string val; 
         while(std::getline(s, val, ','))
         {
-            packet.push_back(stof(val)); 
+            try{
+                packet.push_back(stof(val)); 
+            }
+            catch (std::exception& e)
+            { 
+                    //If stof fails due to bad input, look at csv file encoding.(i.e. UTF-8 works)
+                    std::cout << "Yikes if this prints" << std::endl; 
+            }
         }
         data.pop(); 
         return packet; 
