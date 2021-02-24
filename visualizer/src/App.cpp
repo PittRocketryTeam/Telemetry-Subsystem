@@ -38,8 +38,7 @@ void App::init()
     test_mesh.scale = glm::vec3(0.75f);
 
     flame = ModelLoader::open("assets/models/flame.dae");
-    //flame.scale = glm::vec3(1.0f); 
-    test_mesh.addChild(&flame); //won't rotate with quaternion if this line enabled; ill fix it later
+    test_mesh.addChild(&flame); 
 
     skybox = ModelLoader::open("assets/models/skybox.dae");
     skybox.scale = glm::vec3(500.f);
@@ -129,6 +128,7 @@ void App::addCheckPoint()
 
 void App::update()
 {
+    
     if(!zeeData.isEmpty())
     {
         std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
@@ -146,15 +146,12 @@ void App::update()
 
         px = x; 
         pz = z; 
+        test_mesh.quat = glm::quat(orientation_pkt[3], orientation_pkt[4], orientation_pkt[5], orientation_pkt[6]); 
     }
-    //test_mesh.quat = glm::quat(orientation_pkt[12], orientation_pkt[15], orientation_pkt[13], orientation_pkt[14]); 
-    
-    //flame.position = test_mesh.position; 
-    //flame.quat = test_mesh.quat;  
 
-    test_mesh.update(); //use test_mesh.update(1) to do a quaternion rotation 
+    test_mesh.update(1); //use test_mesh.update(1) to do a quaternion rotation 
     test_cube.update();
-    //flame.update(1); //rotate the same way as test_mesh; not updating correctly; don't know why
+    
     vehicle_tracker.position = test_mesh.position;
     vehicle_tracker.update();
     skybox.update();
