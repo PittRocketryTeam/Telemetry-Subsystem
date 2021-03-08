@@ -84,13 +84,13 @@ std::vector<float> Client::getPacket()
     return last_packet;
 }
 
-#ifdef main
-#undef main
-#endif
-int main(int argc, char *argv[])
-{
-    Client::con();
+// #ifdef main
+// #undef main
+// #endif
+// int main(int argc, char *argv[])
+// {
+//     Client::con();
 
-    return 0;
-}
+//     return 0;
+// }
 
