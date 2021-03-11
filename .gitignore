@@ -1,3 +1,4 @@
 **/__pycache__/
 **/build/
 *.class
+**/log.txt

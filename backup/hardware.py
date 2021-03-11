@@ -66,7 +66,7 @@ class device:
 			num_available_bytes = self.ser.inWaiting()
 			return self.ser.read(num_available_bytes)
 		else:
-			print("Serial port not open")
+			#print("Serial port not open")
 			return None
 
 	# write the data out to the serial port
@@ -89,5 +89,5 @@ class device:
 				print("Serial port not writable")
 				return 0
 		else:
-			print("Serial port not open")
+			#print("Serial port not open")
 			return 0
