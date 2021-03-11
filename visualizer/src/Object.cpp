@@ -116,17 +116,28 @@ void Object::move()
     position += velocity.z * -front;
 }
 
-void Object::update()
+void Object::update(int rquat)
 {
-    update(glm::mat4(1.0f));
+    if(rquat != NULL)
+    {
+        update(glm::mat4(1.0f), rquat);
+    }
+    else
+    {
+        update(glm::mat4(1.0f));
+    }
 }
 
-void Object::update(glm::mat4 pmat)
+void Object::update(glm::mat4 pmat, int rquat)
 {
-    quat = ry * rz * rx;
+    if(rquat == NULL)
+    {
+        quat = ry * rz * rx;
+    }
 
     glm::mat4 t = glm::translate(glm::mat4(1.0f), position);
-    glm::mat4 r = glm::toMat4(quat);
+    //std::cout << this->quat << std::endl; 
+    glm::mat4 r = glm::mat4_cast(quat);
     glm::mat4 s = glm::scale(glm::mat4(1.0f), scale);
 
     matrix = inherent * t * r * s;

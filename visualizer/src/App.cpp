@@ -25,7 +25,8 @@ static Object camera_arm;
 static std::vector<glm::vec3> path; 
 static Mesh what_mesh; 
 static int counter; 
-static bool burnout; 
+static bool burnout, initial_position; 
+static float px, pz, x, z; 
 
 void App::init()
 { 
@@ -46,7 +47,7 @@ void App::init()
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
-    // zeeData.readData("../../test-data/data.csv");
+    zeeData.readData("../../test-data/s_data.csv");
 
     // the camera arm holds the camera a distance of 50 away from the vehicle
     camera_arm.addChild(&Camera::getObject());
@@ -127,13 +128,30 @@ void App::addCheckPoint()
 
 void App::update()
 {
-    test_mesh.position.y += 0.2f;
-    flame.position = test_mesh.position;  
-    // std::cout << test_mesh.position.y << std::endl;
+    
+    if(!zeeData.isEmpty())
+    {
+        std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
+        if(!initial_position)
+        { //Only need x and z to determine where the rocket is heading
+            px = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000;
+            pz = sinf(orientation_pkt[1]) * 1000000;
+            initial_position = true; 
+        }
+        x = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000; //cos(latitude) * cos(latitude)
+        z = sinf(orientation_pkt[1]) * 1000000; //sin(latitude)
+        
+        test_mesh.position += (glm::vec3((x - px) * 0.05, 0, (z-pz) * 0.05)); //Scale
+        test_mesh.position.y = (orientation_pkt[0] * (470.f/10000)); //Scale
 
-    test_mesh.update();
+        px = x; 
+        pz = z; 
+        test_mesh.quat = glm::quat(orientation_pkt[3], orientation_pkt[4], orientation_pkt[5], orientation_pkt[6]); 
+    }
+
+    test_mesh.update(1); //use test_mesh.update(1) to do a quaternion rotation 
     test_cube.update();
-    flame.update(); 
+    
     vehicle_tracker.position = test_mesh.position;
     vehicle_tracker.update();
     skybox.update();

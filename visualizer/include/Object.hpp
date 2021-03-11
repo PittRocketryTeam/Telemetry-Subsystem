@@ -18,8 +18,8 @@ public:
     void addChild(Object*);
 
     void move();
-    virtual void update();
-    virtual void update(glm::mat4);
+    virtual void update(int = 0);
+    virtual void update(glm::mat4, int = 0);
 
     glm::mat4 getWorldMatrix();
     glm::vec3 getWorldPosition();
