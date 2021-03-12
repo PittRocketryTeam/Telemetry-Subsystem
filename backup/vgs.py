@@ -2,8 +2,9 @@
 
 import tkinter as tk
 from hardware import device
-import struct
 import threading as th
+from vehicle import State
+import time
 
 dev_thread = None
 window = None
@@ -24,72 +25,55 @@ def send_cb(event):
 def shutdown():
     global window
     global running
+    global dev_thread
+
     running = False
+    print("waiting on worker...")
+    if dev_thread:
+        dev_thread.join()
     window.destroy()
-
-def int32(b):
-    return int.from_bytes(b, byteorder='little') 
-
-def fp32(b):
-    return struct.unpack('f', b)[0]
 
 def dev_handler(monitor):
     global running
+
+    st = State()
 
     teensy = device()
     teensy.connect()
     fp = open("log.txt", "a")
     fp.write("==================== BEGIN LOG ====================\n")
-    while True:
-        if not running:
-            break
+    while running:
+        
         data = (teensy.read())
+        st.extract(data)
 
-        if data and len(data) == 62:
-            pln = int32(data[0:4])
-            pid = int32(data[4:8])
-            ax = fp32(data[8:12])
-            ay = fp32(data[12:16])
-            az = fp32(data[16:20])
-            wx = fp32(data[20:24])
-            wy = fp32(data[24:28])
-            wz = fp32(data[28:32])
-            qx = fp32(data[32:36])
-            qy = fp32(data[36:40])
-            qz = fp32(data[40:44])
-            qw = fp32(data[44:48])
-            lat = fp32(data[48:52])
-            lon = fp32(data[52:56])
-            alt = fp32(data[56:60])
+        # todo parse
 
-            ln = '{0}\t{1}\t{2:.3f}\t{3:.3f}\t{4:.3f}\t{5:.3f}\t{6:.3f}\t{7:.3f}\t{8:.3f}\t{9:.3f}\t{10:.3f}'.format(
-                pln,
-                pid,
-                ax,
-                ay,
-                az,
-                wx,
-                wy,
-                wz,
-                lat,
-                lon,
-                alt
-            )
-
+        if st.update:
+            ln = st.getline()
+            monitor.configure(state=tk.NORMAL)
             monitor.insert(tk.END, ln + '\n')
             fp.write(ln + '\n')
+            monitor.configure(state=tk.DISABLED)
+            monitor.see("end")
 
         cmd_q_mutex.acquire()
         if len(cmd_q) > 0:
-            # todo proc command
-            pass
+            monitor.configure(state=tk.NORMAL)
+            monitor.insert(tk.END, "SEND COMMAND: " + cmd_q[0] + '\n')
+            monitor.configure(state=tk.DISABLED)
+            cmd_q.pop(0)
+            monitor.see("end")
 
         cmd_q_mutex.release()
+
+        #time.sleep(0.001)
 
 def main():
     global window
     global monitor
     global cmdline
+    global dev_thread
 
     window = tk.Tk()
     window.protocol("WM_DELETE_WINDOW", shutdown)
@@ -101,7 +85,7 @@ def main():
 
     monitor.pack(expand=1, fill=tk.BOTH)
     cmdline.pack(expand=1, side=tk.LEFT, fill=tk.X)
-    sendbtn.pack(side=tk.RIGHT)
+    sendbtn.pack(side=tk.RIGHT)    
 
     dev_thread = th.Thread(target=dev_handler, args=(monitor,))
     dev_thread.start()
