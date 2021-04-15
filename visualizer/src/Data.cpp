@@ -30,6 +30,9 @@ void Data::readData(std::string path)
     // Read from the .csv file
     std::ifstream MyReadFile(path);
 
+    //Ignore file header (first line in .csv file)
+    std::getline(MyReadFile, packet);
+
     // Use a while loop together with the getline() function to read the file line by line
     while (std::getline(MyReadFile, packet)) {
         // Push data info into queue. 

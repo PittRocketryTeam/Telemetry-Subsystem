@@ -25,7 +25,7 @@ static Object camera_arm;
 static std::vector<glm::vec3> path; 
 static Mesh what_mesh; 
 static int counter; 
-static bool burnout, initial_position; 
+static bool burnout, initial_position, start; 
 static float px, pz, x, z; 
 
 void App::init()
@@ -47,7 +47,7 @@ void App::init()
     ground.scale = glm::vec3(250.f);
     ground.position.y = -4;
 
-    zeeData.readData("../../test-data/s_data.csv");
+    zeeData.readData("../../test-data/fc.csv");
 
     // the camera arm holds the camera a distance of 50 away from the vehicle
     camera_arm.addChild(&Camera::getObject());
@@ -93,7 +93,10 @@ void App::checkKeyboardMovement()
     {
         camera_arm.position.y -= 1.f;
     }
-    
+    else if(Keyboard::isDown(SDL_SCANCODE_Z))
+    {
+        start = true; 
+    }
     // this block just clamps the x rotation
     float thx = glm::eulerAngles(vehicle_tracker.rx).x;
     if (thx > 0.f && thx <= M_PI_2)
@@ -128,25 +131,38 @@ void App::addCheckPoint()
 
 void App::update()
 {
-    
-    if(!zeeData.isEmpty())
+    //Make sure you press Z to start 
+    if(!zeeData.isEmpty() && start)
     {
         std::vector<float> orientation_pkt = zeeData.pollData(); //orientation packet 
         if(!initial_position)
         { //Only need x and z to determine where the rocket is heading
-            px = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000;
-            pz = sinf(orientation_pkt[1]) * 1000000;
+            auto cx = (orientation_pkt[1]/100.f);
+            auto cz = (orientation_pkt[2]/100.f);
+            px = cosf(cx) * cosf(cz) * 1000000;
+            pz = sinf(cx) * 1000000;
+            
             initial_position = true; 
+            test_mesh.quat = glm::quat(1.f, 0.f, 0.f, 0.f); //idk if this right but whatever 
         }
-        x = cosf(orientation_pkt[1]) * cosf(orientation_pkt[2]) * 1000000; //cos(latitude) * cos(latitude)
-        z = sinf(orientation_pkt[1]) * 1000000; //sin(latitude)
-        
-        test_mesh.position += (glm::vec3((x - px) * 0.05, 0, (z-pz) * 0.05)); //Scale
-        test_mesh.position.y = (orientation_pkt[0] * (470.f/10000)); //Scale
-
-        px = x; 
-        pz = z; 
-        test_mesh.quat = glm::quat(orientation_pkt[3], orientation_pkt[4], orientation_pkt[5], orientation_pkt[6]); 
+        else{
+            //std::cout << "Lon"
+            auto cx = (orientation_pkt[1]/100.f); //if you are using the fc.csv file, i divided by 100 to get the right format for the GPS coordinates and ya
+            auto cz = (orientation_pkt[2]/100.f); 
+            //std::cout << cx << " : " << cz << std::endl; 
+            x = cosf(cx) * cosf(cz) * 1000000; //cos(latitude) * cos(longitude)
+            z = sinf(cx) * 1000000; //sin(latitude)
+            
+            test_mesh.position += (glm::vec3((x - px) * 0.05, 0, (z-pz) * 0.05)); //Scale
+            test_mesh.position.y = (orientation_pkt[0] * (500.f/10000)); //Scale
+            //std::cout << "SDFKJHSD "<< x-px << " : " << z-pz << std::endl; 
+            //std::cout << test_mesh.position.y << std::endl; 
+            px = x; 
+            pz = z; 
+            
+            //Combine rotations -- rotate from one quaternion to another 
+            test_mesh.quat = glm::quat(orientation_pkt[3], orientation_pkt[4], orientation_pkt[5], orientation_pkt[6]) * test_mesh.quat; //5, 6, 3, 4 looks decent???
+        }
     }
 
     test_mesh.update(1); //use test_mesh.update(1) to do a quaternion rotation 
@@ -156,6 +172,7 @@ void App::update()
     vehicle_tracker.update();
     skybox.update();
     ground.update();
+
     checkKeyboardMovement();
     if(counter == 5)
     {
